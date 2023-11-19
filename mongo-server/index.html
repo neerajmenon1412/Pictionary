@@ -1,0 +1,87 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Upload</title>
+</head>
+<body>
+  <form id="uploadForm" action="http://localhost:3010/images" method="post" enctype="multipart/form-data">
+    <label for="name">Name:</label>
+    <input type="text" name="name" id="name" required>
+    <br>
+    <label for="description">Description:</label>
+    <input type="text" name="description" id="description" required>
+    <br>
+    <label for="category">Category:</label>
+    <input type="number" name="category" id="category" required>
+    <br>
+    <label for="image">Select Image:</label>
+    <input type="file" name="image" id="image" accept="image/*" required>
+    <br>
+    <button type="submit">Save</button>
+  </form>
+
+  <div id="imageContainer"></div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+
+      // Convert image to base64
+      const imageFile = formData.get('image');
+      const reader = new FileReader();
+
+      reader.onloadend = function () {
+        const base64Image = reader.result;
+
+        // Set the base64-encoded image as a field in the FormData
+        formData.set('value', base64Image);
+
+        // For demonstration purposes, log the FormData
+        for (let [key, value] of formData.entries()) {
+          console.log(`${key}: ${value}`);
+        }
+
+        // You can use the formData to handle the submission or any other logic
+        var reqData = {
+          id: Math.floor(Math.random() * 100) + 1,
+          name: formData.get('name'),
+          description: formData.get('description'),
+          category: Number(formData.get('category')),
+          value: formData.get('value')
+        };
+        console.log(reqData);
+
+        // Simulate the form submission
+        fetch('http://localhost:3010/images', {
+          method: 'POST',
+          body: JSON.stringify(reqData),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          console.log('API Response:', data);
+        })
+        .catch(error => console.error('Error:', error));
+      };
+
+      // Read the image file as a base64-encoded string
+      reader.readAsDataURL(imageFile);
+    });
+
+    function displayImage(base64Image) {
+      const imageContainer = document.getElementById('imageContainer');
+      const imageElement = document.createElement('img');
+      imageElement.src = base64Image;
+      imageElement.style.maxWidth = '100%';
+      imageContainer.innerHTML = '';
+      imageContainer.appendChild(imageElement);
+    }
+  </script>
+</body>
+</html>

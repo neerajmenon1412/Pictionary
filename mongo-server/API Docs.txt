@@ -1,0 +1,34 @@
+Category Service:
+
+1. GET /categories
+Returns a list of all categories.
+2. GET /categories/:categoryId
+Returns details of a specific category.
+3. POST /categories
+Creates a new category.
+4. PUT /categories/:categoryId
+Updates details of a specific category.
+5. DELETE /categories/:categoryId
+Deletes a specific category.
+
+Image Service:
+
+1. GET /images
+Returns a list of all images.
+2. GET /images/:imageId
+Returns details of a specific image.
+3. POST /images
+Creates a new image.
+4. PUT /images/:imageId
+Updates details of a specific image.
+5. DELETE /images/:imageId
+Deletes a specific image.
+
+API Service:
+
+1. GET stats/categories/count
+Returns the count of categories.
+2. GET stats/images/count
+Returns the count of images.
+3. GET stats/images/:categoryId
+Returns images belonging to a specific category.
