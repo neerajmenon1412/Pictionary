@@ -1,2 +1,2 @@
-# pictionary
+# Pictionary
 A Simple Pictionary App
