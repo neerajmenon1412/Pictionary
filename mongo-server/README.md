@@ -51,7 +51,7 @@ This will initiate the MongoDB server, and it will be accessible on port 3010. E
 2. **Run Custom Application:**
    - The custom application is located at `mongo-server/index.html`.
    - Double-click on `index.html` in Finder or Explorer to run the application.
-   - This waas created to mimic an application calling the APIs. Not a part of our actual project.
+   - This waas created to mimic an application calling the backend APIs. Not a part of our actual project.
 
 3. **Image Size Limitation:**
    Currently, the application supports images up to 50kb. To handle larger images, consider implementing GridFS for MongoDB.
