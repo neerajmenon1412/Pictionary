@@ -1,2 +1,2 @@
 # Pictionary
-A Simple Pictionary App
+A Simple Pictionary App.
