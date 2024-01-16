@@ -33,9 +33,9 @@
     },
     {
       "name": "cross_file",
-      "rootUri": "file:///C:/Users/neera/AppData/Local/Pub/Cache/hosted/pub.dev/cross_file-0.3.3+7",
+      "rootUri": "file:///C:/Users/neera/AppData/Local/Pub/Cache/hosted/pub.dev/cross_file-0.3.3+8",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.2"
     },
     {
       "name": "cupertino_icons",
@@ -105,9 +105,9 @@
     },
     {
       "name": "http",
-      "rootUri": "file:///C:/Users/neera/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.1.0",
+      "rootUri": "file:///C:/Users/neera/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.1.2",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.2"
     },
     {
       "name": "http_parser",
@@ -160,12 +160,6 @@
     {
       "name": "image_picker_windows",
       "rootUri": "file:///C:/Users/neera/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_windows-0.2.1+1",
-      "packageUri": "lib/",
-      "languageVersion": "2.19"
-    },
-    {
-      "name": "js",
-      "rootUri": "file:///C:/Users/neera/AppData/Local/Pub/Cache/hosted/pub.dev/js-0.6.7",
       "packageUri": "lib/",
       "languageVersion": "2.19"
     },
@@ -278,7 +272,7 @@
       "languageVersion": "3.1"
     }
   ],
-  "generated": "2023-11-29T09:27:10.372152Z",
+  "generated": "2023-12-07T09:06:15.702030Z",
   "generator": "pub",
   "generatorVersion": "3.2.1"
 }
