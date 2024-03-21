@@ -1,4 +1,0 @@
-#Wed Nov 29 01:42:53 PST 2023
-base.0=C\:\\Projects\\Frugal\\Pictionary\\pictionary-main\\mobile_app\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
-path.0=classes.dex
-renamed.0=classes.dex

@@ -1,1 +1,0 @@
- C:\\Projects\\Frugal\\Pictionary\\pictionary-main\\mobile_app\\.dart_tool\\flutter_build\\ea5bd446c8110dcafb5fbdcea7cab82f\\native_assets.yaml: 
