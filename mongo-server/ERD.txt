@@ -1,0 +1,11 @@
+Entity-Relationship Diagram (ERD)
+
++--------------+         +----------------+
+|   Category   |         |    Image       |
++--------------+         +----------------+
+| id           |         | id             |
+| name         | ------- | name           |
+| description  |         | description    |
++--------------+         | category (FK)  |
+                         | value          |
+                         +----------------+
