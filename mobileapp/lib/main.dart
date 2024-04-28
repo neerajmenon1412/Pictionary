@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:video_compress/video_compress.dart';
 
 void main() {
   runApp(MyApp());
@@ -79,62 +80,70 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> _saveVideoData() async {
+  Future<void> _compressAndUploadVideo() async {
     if (_videoFile == null) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Video not uploaded!'),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        },
-      );
+      print('No video selected for upload.');
       return;
     }
 
-    var uri = Uri.parse(
-        'http://172.31.16.116:3010/videos/upload'); // Adjust the URL as needed
-    var request = http.MultipartRequest('POST', uri);
+    // Get the original video file size
+    File originalVideoFile = File(_videoFile!.path);
+    int originalSize = await originalVideoFile.length();
+    print('Original video size: $originalSize bytes');
 
-    request.files.add(
-      http.MultipartFile(
-        'video',
-        _videoFile!.readAsBytes().asStream(),
-        await _videoFile!.length(),
-        filename: _videoFile!.name,
-        contentType: MediaType('video', 'mp4'), // Assuming the video is MP4
-      ),
+    // Compress the video
+    final MediaInfo? compressedVideo = await VideoCompress.compressVideo(
+      _videoFile!.path,
+      quality: VideoQuality
+          .DefaultQuality, // Adjusted to default for better compatibility
+      deleteOrigin: false, // Optionally delete the original file
     );
 
-    var streamedResponse = await request.send();
-
-    final response = await http.Response.fromStream(streamedResponse);
-
-    if (response.statusCode == 200) {
-      print('Video uploaded successfully');
-      // You can perform additional actions here, such as refreshing the UI
+    if (compressedVideo != null && compressedVideo.file != null) {
+      int compressedSize = await compressedVideo.file!.length();
+      print('Original video size: $originalSize bytes');
+      print('Compressed video size: $compressedSize bytes');
+      print(
+          'Compression reduced the video size by ${originalSize - compressedSize} bytes');
+      print('Compression successful, starting upload...');
+      _uploadVideo(
+          compressedVideo.file!); // Pass the compressed file for upload
     } else {
-      print('Failed to upload video data. Status code: ${response.statusCode}');
-      // Handle error, possibly showing an alert to the user
+      print('Failed to compress video.');
+    }
+  }
+
+  Future<void> _uploadVideo(File videoFile) async {
+    var uri = Uri.parse('http://172.31.28.133:3010/videos/upload');
+    var request = http.MultipartRequest('POST', uri);
+
+    try {
+      // Await the creation of the MultipartFile before adding it to the request
+      var multipartFile = await http.MultipartFile.fromPath(
+        'video',
+        videoFile.path,
+        contentType: MediaType('video', 'mp4'), // Assuming the video is MP4
+      );
+      request.files
+          .add(multipartFile); // Add the multipart file after it's ready
+
+      var streamedResponse = await request.send();
+      if (streamedResponse.statusCode == 201) {
+        print('Video uploaded successfully');
+      } else {
+        print(
+            'Failed to upload video. Status code: ${streamedResponse.statusCode}');
+      }
+    } catch (e) {
+      print('Error uploading video: $e');
     }
   }
 
   Future<void> _saveCategoryData() async {
-    var url = Uri.parse(
-        'http://172.31.200.20:3010/categories'); // Adjust the URL as needed
-
+    var url = Uri.parse('http://172.31.28.133:3010/categories');
     var response = await http.post(
       url,
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
       body: json.encode({
         "name": _nameController.text,
         "description": _descriptionController.text,
@@ -154,108 +163,72 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_imageFile == null) {
       showDialog(
         context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Image not uploaded!'),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        },
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Image not uploaded!'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
       );
       return;
     }
 
-    // Compress the image
     final filePath = _imageFile!.path;
-    final lastIndex = filePath.lastIndexOf(new RegExp(r'.jp'));
-    final splitted = filePath.substring(0, (lastIndex));
-    final outPath = "${splitted}_out${filePath.substring(lastIndex)}";
+    final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+    final outPath =
+        "${filePath.substring(0, lastIndex)}_out${filePath.substring(lastIndex)}";
     var compressedImage = await FlutterImageCompress.compressAndGetFile(
       filePath,
       outPath,
-      quality: 50, // You can adjust the quality as needed
+      quality: 50, // Quality adjusted for better compression
     );
 
-    if (compressedImage == null) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Failed to compress image!'),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        },
+    if (compressedImage != null) {
+      final imageBytes = await compressedImage.readAsBytes();
+      var response = await http.post(
+        Uri.parse('http://172.31.28.133:3010/images'),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: json.encode({
+          "name": _nameController.text,
+          "description": _descriptionController.text,
+          "category": _categoryController.text,
+          "value": base64Encode(imageBytes),
+        }),
       );
-      return;
-    }
-    // Log the file sizes for comparison
-    print("Original size: ${await File(filePath).length()}");
-    print("Compressed size: ${await compressedImage.length()}");
 
-    // Read the compressed image bytes
-    final imageBytes = await compressedImage.readAsBytes();
-    if (imageBytes == null) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Failed to read compressed image bytes!'),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    var url = Uri.parse(
-        'http://172.31.200.20:3010/images'); // Adjust the URL as needed
-
-    var response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: json.encode({
-        "name": _nameController.text,
-        "description": _descriptionController.text,
-        "category": _categoryController.text,
-        "value": base64Encode(imageBytes),
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      print('Image data uploaded successfully');
-      setState(() {
-        // Refresh the list of images
-        _imageListFuture = fetchImages();
-      });
+      if (response.statusCode == 200) {
+        print('Image data uploaded successfully');
+        setState(() {
+          _imageListFuture = fetchImages();
+        });
+      } else {
+        print(
+            'Failed to upload image data. Status code: ${response.statusCode}');
+      }
     } else {
-      print('Failed to upload image data. Status code: ${response.statusCode}');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to compress image!'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
     }
   }
 
   Future<List<ImageData>> fetchImages() async {
-    var url = Uri.parse(
-        'http://172.31.200.20:3010/images'); // Adjust the URL as needed
-    var response = await http.get(url);
-
+    var response =
+        await http.get(Uri.parse('http://172.31.28.133:3010/images'));
     if (response.statusCode == 200) {
       List<dynamic> imageList = json.decode(response.body);
       return imageList.map((image) => ImageData.fromJson(image)).toList();
@@ -275,7 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
           padding: EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
+            children: [
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(labelText: 'Name'),
@@ -293,27 +266,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? Text("No image selected.")
                   : Image.file(File(_imageFile!.path)),
               ElevatedButton(
-                onPressed: _pickImage,
-                child: Text('Select Image'),
-              ),
+                  onPressed: _pickImage, child: Text('Select Image')),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _saveImageData,
-                child: Text('Save Image'),
-              ),
+                  onPressed: _saveImageData, child: Text('Save Image')),
               ElevatedButton(
-                onPressed: _saveCategoryData,
-                child: Text('Save Category Data'),
-              ),
+                  onPressed: _saveCategoryData,
+                  child: Text('Save Category Data')),
               ElevatedButton(
-                onPressed: _pickVideo,
-                child: Text('Select Video'),
-              ),
+                  onPressed: _pickVideo, child: Text('Select Video')),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _saveVideoData,
-                child: Text('Save Video'),
-              ),
+                  onPressed: _compressAndUploadVideo,
+                  child: Text('Upload Video')),
               SizedBox(height: 20),
               Text('Uploaded Images:',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
