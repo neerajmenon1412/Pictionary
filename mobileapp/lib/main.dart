@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final MediaInfo? compressedVideo = await VideoCompress.compressVideo(
       _videoFile!.path,
       quality: VideoQuality
-          .DefaultQuality, // Adjusted to default for better compatibility
+          .LowQuality, // Adjusted to Low for better compatibility
       deleteOrigin: false, // Optionally delete the original file
     );
 
