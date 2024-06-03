@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Video</title>
+</head>
+<body>
+    <h1>Upload Video</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="videoInput" name="video" accept="video/*" required>
+        <button type="submit">Upload</button>
+    </form>
+    <script>
+        document.getElementById('uploadForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const videoInput = document.getElementById('videoInput');
+            const file = videoInput.files[0];
+            if (!file) {
+                alert("Please select a video file.");
+                return;
+            }
+            if (file.type !== 'video/mp4') {
+                alert("Please select an MP4 video file.");
+                return;
+            }
+            const formData = new FormData();
+            formData.append('video', file);
+            const response = await fetch('http://localhost:3010/format/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            alert(result.message);
+        }
+    </script>
+</body>
+</html>

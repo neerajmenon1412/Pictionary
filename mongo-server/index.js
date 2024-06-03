@@ -5,6 +5,7 @@ const categoryRouter = require('./routes/categoryRoutes.js');
 const imageRouter = require('./routes/imageRoutes.js');
 const statRouter = require('./routes/statRoutes.js');
 const videoRouter = require('./routes/videoRoutes.js'); // Import video routes
+const formatRouter = require('./routes/formatRoutes.js'); // Import video routes
 
 const config = require('./config');
 const { connectToDatabase } = require('./services/mongoService');
@@ -43,6 +44,7 @@ app.use('/categories', categoryRouter);
 app.use('/images', imageRouter);
 app.use('/stats', statRouter);
 app.use('/videos', videoRouter); // Setup video routes
+app.use('/format', formatRouter); 
 
 // Other configurations and error handling
 const PORT = process.env.PORT || 3010;

@@ -1,0 +1,18 @@
+{
+  "name": "file_example_MP4_1280_10MG.mp4",
+  "formats": [
+    {
+      "resolution": 240,
+      "path": "/Users/nikhilshankar/Downloads/SCU/8 - DR/Pictionary/mongo-server/processed/f9c46712a5a0f3f1d0398f4a2e71b3ee-240p.mp4"
+    },
+    {
+      "resolution": 720,
+      "path": "/Users/nikhilshankar/Downloads/SCU/8 - DR/Pictionary/mongo-server/processed/f9c46712a5a0f3f1d0398f4a2e71b3ee-720p.mp4"
+    },
+    {
+      "resolution": 1080,
+      "path": "/Users/nikhilshankar/Downloads/SCU/8 - DR/Pictionary/mongo-server/processed/f9c46712a5a0f3f1d0398f4a2e71b3ee-1080p.mp4"
+    }
+  ],
+  "createdAt": "2024-06-03T00:52:16.686Z"
+}
